@@ -1,0 +1,19 @@
+{
+  "name": "ideatic/cldr",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Javier Marín",
+      "email": "contacto@ideatic.net"
+    }
+  ],
+  "type": "library",
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "ideatic\\l10n\\": "src/"
+    }
+  }
+}
