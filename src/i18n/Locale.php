@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -123,10 +124,14 @@ abstract class i18n_Locale
         foreach ($locale as $code) {
             // Nombre de la clase que representa el locale
             $className = 'i18n_Locale_' . str_replace('-', '_', $code) . '_Data';
-            $path = __DIR__ . '/Locale/' . str_replace('-', '/', $code) . '/Data.php';
+            if (!class_exists($className, false)) {
+                $path = __DIR__ . '/Locale/' . str_replace('-', '/', $code) . '/Data.php';
 
-            if (is_file($path)) {
-                require $path;
+                if (is_file($path)) {
+                    require $path;
+                    return new $className();
+                }
+            } else {
                 return new $className();
             }
         }
