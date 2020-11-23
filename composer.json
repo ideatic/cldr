@@ -12,8 +12,11 @@
     "php": ">=7.4"
   },
   "autoload": {
-    "psr-4": {
-      "ideatic\\l10n\\": "src/"
-    }
+    "psr-0": {
+      "i18n_": "src/"
+    },
+    "exclude-from-classmap": [
+      "src/i18n/Locale/"
+    ]
   }
 }
