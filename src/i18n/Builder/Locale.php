@@ -68,7 +68,7 @@ class i18n_Builder_Locale
 
         // Eliminar temporales
         if (isset($tempPath)) {
-            IO::delete($tempPath);
+            unlink($tempPath);
         }
 
         echo '<h2>Finish</h2>';
@@ -86,7 +86,7 @@ class i18n_Builder_Locale
 
         // Descargar última versión
         $zipPath = $tempPath . '/core.zip';
-        if (!IO::exists($zipPath)) {
+        if (!file_exists($zipPath)) {
             $latestUrl = self::DB_URL;
             echo "<p>Downloading $latestUrl</p>";
             $ch = curl_init($latestUrl);

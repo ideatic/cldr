@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -12,7 +13,8 @@ declare(strict_types=1);
  */
 class i18n_Locale_bg_Data extends i18n_Locale
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Version 38
         $this->orientation = 'ltr';
         $this->decimalSeparator = ',';
@@ -32,116 +34,122 @@ class i18n_Locale_bg_Data extends i18n_Locale
         $this->nameEnglish = 'Bulgarian';
         $this->nameNative = 'Български';
     }
-        
-    public function months($type = i18n_Locale::TYPE_WIDE): array{
-        switch($type) {
+
+    public function months($type = i18n_Locale::TYPE_WIDE): array
+    {
+        switch ($type) {
             case i18n_Locale::TYPE_ABBREVIATED:
-                return array (
-                      1 => 'яну',
-                      2 => 'фев',
-                      3 => 'март',
-                      4 => 'апр',
-                      5 => 'май',
-                      6 => 'юни',
-                      7 => 'юли',
-                      8 => 'авг',
-                      9 => 'сеп',
-                      10 => 'окт',
-                      11 => 'ное',
-                      12 => 'дек',
-                    );
+                return [
+                    1  => 'яну',
+                    2  => 'фев',
+                    3  => 'март',
+                    4  => 'апр',
+                    5  => 'май',
+                    6  => 'юни',
+                    7  => 'юли',
+                    8  => 'авг',
+                    9  => 'сеп',
+                    10 => 'окт',
+                    11 => 'ное',
+                    12 => 'дек',
+                ];
             case i18n_Locale::TYPE_NARROW:
-                return array (
-                      1 => 'я',
-                      2 => 'ф',
-                      3 => 'м',
-                      4 => 'а',
-                      5 => 'м',
-                      6 => 'ю',
-                      7 => 'ю',
-                      8 => 'а',
-                      9 => 'с',
-                      10 => 'о',
-                      11 => 'н',
-                      12 => 'д',
-                    );
+                return [
+                    1  => 'я',
+                    2  => 'ф',
+                    3  => 'м',
+                    4  => 'а',
+                    5  => 'м',
+                    6  => 'ю',
+                    7  => 'ю',
+                    8  => 'а',
+                    9  => 'с',
+                    10 => 'о',
+                    11 => 'н',
+                    12 => 'д',
+                ];
             case i18n_Locale::TYPE_WIDE:
-                return array (
-                      1 => 'януари',
-                      2 => 'февруари',
-                      3 => 'март',
-                      4 => 'април',
-                      5 => 'май',
-                      6 => 'юни',
-                      7 => 'юли',
-                      8 => 'август',
-                      9 => 'септември',
-                      10 => 'октомври',
-                      11 => 'ноември',
-                      12 => 'декември',
-                    );
+                return [
+                    1  => 'януари',
+                    2  => 'февруари',
+                    3  => 'март',
+                    4  => 'април',
+                    5  => 'май',
+                    6  => 'юни',
+                    7  => 'юли',
+                    8  => 'август',
+                    9  => 'септември',
+                    10 => 'октомври',
+                    11 => 'ноември',
+                    12 => 'декември',
+                ];
         }
     }
 
-        public function weekDays($type = i18n_Locale::TYPE_WIDE): array{
-        switch($type) {
+    public function weekDays($type = i18n_Locale::TYPE_WIDE): array
+    {
+        switch ($type) {
             case i18n_Locale::TYPE_ABBREVIATED:
-                return array (
-                      0 => 'нд',
-                      1 => 'пн',
-                      2 => 'вт',
-                      3 => 'ср',
-                      4 => 'чт',
-                      5 => 'пт',
-                      6 => 'сб',
-                    );
+                return [
+                    0 => 'нд',
+                    1 => 'пн',
+                    2 => 'вт',
+                    3 => 'ср',
+                    4 => 'чт',
+                    5 => 'пт',
+                    6 => 'сб',
+                ];
             case i18n_Locale::TYPE_NARROW:
-                return array (
-                      0 => 'н',
-                      1 => 'п',
-                      2 => 'в',
-                      3 => 'с',
-                      4 => 'ч',
-                      5 => 'п',
-                      6 => 'с',
-                    );
+                return [
+                    0 => 'н',
+                    1 => 'п',
+                    2 => 'в',
+                    3 => 'с',
+                    4 => 'ч',
+                    5 => 'п',
+                    6 => 'с',
+                ];
             case i18n_Locale::TYPE_WIDE:
-                return array (
-                      0 => 'неделя',
-                      1 => 'понеделник',
-                      2 => 'вторник',
-                      3 => 'сряда',
-                      4 => 'четвъртък',
-                      5 => 'петък',
-                      6 => 'събота',
-                    );
+                return [
+                    0 => 'неделя',
+                    1 => 'понеделник',
+                    2 => 'вторник',
+                    3 => 'сряда',
+                    4 => 'четвъртък',
+                    5 => 'петък',
+                    6 => 'събота',
+                ];
         }
     }
 
-        public function intervals(): array{
-                    return array (
-              'year' => '{n, plural, one {# година} other {# години}}',
-              'month' => '{n, plural, one {# месец} other {# месеца}}',
-              'week' => '{n, plural, one {# седмица} other {# седмици}}',
-              'day' => '{n, plural, one {# ден} other {# дни}}',
-              'hour' => '{n, plural, one {# ч} other {# ч}}',
-              'minute' => '{n, plural, one {# мин} other {# мин}}',
-              'second' => '{n, plural, one {# сек} other {# сек}}',
-              'millisecond' => '{n, plural, one {# мсек} other {# мсек}}',
-              'microsecond' => '{n, plural, one {# μs} other {# μs}}',
-              'nanosecond' => '{n, plural, one {# ns} other {# ns}}',
-            );
-                }
+    public function intervals(): array
+    {
+        return [
+            'year'        => '{n, plural, one {# година} other {# години}}',
+            'month'       => '{n, plural, one {# месец} other {# месеца}}',
+            'week'        => '{n, plural, one {# седмица} other {# седмици}}',
+            'day'         => '{n, plural, one {# ден} other {# дни}}',
+            'hour'        => '{n, plural, one {# ч} other {# ч}}',
+            'minute'      => '{n, plural, one {# мин} other {# мин}}',
+            'second'      => '{n, plural, one {# сек} other {# сек}}',
+            'millisecond' => '{n, plural, one {# мсек} other {# мсек}}',
+            'microsecond' => '{n, plural, one {# μs} other {# μs}}',
+            'nanosecond'  => '{n, plural, one {# ns} other {# ns}}',
+        ];
+    }
 
-        public function currencies(): array{
-                   return require __DIR__ . DIRECTORY_SEPARATOR . 'Currencies.php';
-                }
+    public function currencies(): array
+    {
+        return require __DIR__ . DIRECTORY_SEPARATOR . 'Currencies.php';
+    }
 
-        public function languages(): array{
-                   return require __DIR__ . DIRECTORY_SEPARATOR . 'Languages.php';
-                }
+    public function languages(): array
+    {
+        return require __DIR__ . DIRECTORY_SEPARATOR . 'Languages.php';
+    }
 
-        public function territories(): array{
-                   return require __DIR__ . DIRECTORY_SEPARATOR . 'Territories.php';
-                }
+    public function territories(): array
+    {
+        return require __DIR__ . DIRECTORY_SEPARATOR . 'Territories.php';
+    }
 }

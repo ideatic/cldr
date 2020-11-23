@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -12,7 +13,8 @@ declare(strict_types=1);
  */
 class i18n_Locale_bo_CN_Data extends i18n_Locale
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Version 38
         $this->orientation = 'ltr';
         $this->decimalSeparator = '.';
@@ -32,116 +34,122 @@ class i18n_Locale_bo_CN_Data extends i18n_Locale
         $this->nameEnglish = 'Tibetan (China)';
         $this->nameNative = 'བོད་སྐད་ (རྒྱ་ནག)';
     }
-        
-    public function months($type = i18n_Locale::TYPE_WIDE): array{
-        switch($type) {
+
+    public function months($type = i18n_Locale::TYPE_WIDE): array
+    {
+        switch ($type) {
             case i18n_Locale::TYPE_WIDE:
-                return array (
-                      1 => 'ཟླ་བ་དང་པོ',
-                      2 => 'ཟླ་བ་གཉིས་པ',
-                      3 => 'ཟླ་བ་གསུམ་པ',
-                      4 => 'ཟླ་བ་བཞི་པ',
-                      5 => 'ཟླ་བ་ལྔ་པ',
-                      6 => 'ཟླ་བ་དྲུག་པ',
-                      7 => 'ཟླ་བ་བདུན་པ',
-                      8 => 'ཟླ་བ་བརྒྱད་པ',
-                      9 => 'ཟླ་བ་དགུ་པ',
-                      10 => 'ཟླ་བ་བཅུ་པ',
-                      11 => 'ཟླ་བ་བཅུ་གཅིག་པ',
-                      12 => 'ཟླ་བ་བཅུ་གཉིས་པ',
-                    );
+                return [
+                    1  => 'ཟླ་བ་དང་པོ',
+                    2  => 'ཟླ་བ་གཉིས་པ',
+                    3  => 'ཟླ་བ་གསུམ་པ',
+                    4  => 'ཟླ་བ་བཞི་པ',
+                    5  => 'ཟླ་བ་ལྔ་པ',
+                    6  => 'ཟླ་བ་དྲུག་པ',
+                    7  => 'ཟླ་བ་བདུན་པ',
+                    8  => 'ཟླ་བ་བརྒྱད་པ',
+                    9  => 'ཟླ་བ་དགུ་པ',
+                    10 => 'ཟླ་བ་བཅུ་པ',
+                    11 => 'ཟླ་བ་བཅུ་གཅིག་པ',
+                    12 => 'ཟླ་བ་བཅུ་གཉིས་པ',
+                ];
             case i18n_Locale::TYPE_ABBREVIATED:
-                return array (
-                      1 => 'ཟླ་༡',
-                      2 => 'ཟླ་༢',
-                      3 => 'ཟླ་༣',
-                      4 => 'ཟླ་༤',
-                      5 => 'ཟླ་༥',
-                      6 => 'ཟླ་༦',
-                      7 => 'ཟླ་༧',
-                      8 => 'ཟླ་༨',
-                      9 => 'ཟླ་༩',
-                      10 => 'ཟླ་༡༠',
-                      11 => 'ཟླ་༡༡',
-                      12 => 'ཟླ་༡༢',
-                    );
+                return [
+                    1  => 'ཟླ་༡',
+                    2  => 'ཟླ་༢',
+                    3  => 'ཟླ་༣',
+                    4  => 'ཟླ་༤',
+                    5  => 'ཟླ་༥',
+                    6  => 'ཟླ་༦',
+                    7  => 'ཟླ་༧',
+                    8  => 'ཟླ་༨',
+                    9  => 'ཟླ་༩',
+                    10 => 'ཟླ་༡༠',
+                    11 => 'ཟླ་༡༡',
+                    12 => 'ཟླ་༡༢',
+                ];
             case i18n_Locale::TYPE_NARROW:
-                return array (
-                      1 => 'J',
-                      2 => 'F',
-                      3 => 'M',
-                      4 => 'A',
-                      5 => 'M',
-                      6 => 'J',
-                      7 => 'J',
-                      8 => 'A',
-                      9 => 'S',
-                      10 => 'O',
-                      11 => 'N',
-                      12 => 'D',
-                    );
+                return [
+                    1  => 'J',
+                    2  => 'F',
+                    3  => 'M',
+                    4  => 'A',
+                    5  => 'M',
+                    6  => 'J',
+                    7  => 'J',
+                    8  => 'A',
+                    9  => 'S',
+                    10 => 'O',
+                    11 => 'N',
+                    12 => 'D',
+                ];
         }
     }
 
-        public function weekDays($type = i18n_Locale::TYPE_WIDE): array{
-        switch($type) {
+    public function weekDays($type = i18n_Locale::TYPE_WIDE): array
+    {
+        switch ($type) {
             case i18n_Locale::TYPE_ABBREVIATED:
-                return array (
-                      0 => 'ཉི་མ་',
-                      1 => 'ཟླ་བ་',
-                      2 => 'མིག་དམར་',
-                      3 => 'ལྷག་པ་',
-                      4 => 'ཕུར་བུ་',
-                      5 => 'པ་སངས་',
-                      6 => 'སྤེན་པ་',
-                    );
+                return [
+                    0 => 'ཉི་མ་',
+                    1 => 'ཟླ་བ་',
+                    2 => 'མིག་དམར་',
+                    3 => 'ལྷག་པ་',
+                    4 => 'ཕུར་བུ་',
+                    5 => 'པ་སངས་',
+                    6 => 'སྤེན་པ་',
+                ];
             case i18n_Locale::TYPE_NARROW:
-                return array (
-                      0 => 'ཉི',
-                      1 => 'ཟླ',
-                      2 => 'མིག',
-                      3 => 'ལྷག',
-                      4 => 'ཕུར',
-                      5 => 'སངས',
-                      6 => 'སྤེན',
-                    );
+                return [
+                    0 => 'ཉི',
+                    1 => 'ཟླ',
+                    2 => 'མིག',
+                    3 => 'ལྷག',
+                    4 => 'ཕུར',
+                    5 => 'སངས',
+                    6 => 'སྤེན',
+                ];
             case i18n_Locale::TYPE_WIDE:
-                return array (
-                      0 => 'གཟའ་ཉི་མ་',
-                      1 => 'གཟའ་ཟླ་བ་',
-                      2 => 'གཟའ་མིག་དམར་',
-                      3 => 'གཟའ་ལྷག་པ་',
-                      4 => 'གཟའ་ཕུར་བུ་',
-                      5 => 'གཟའ་པ་སངས་',
-                      6 => 'གཟའ་སྤེན་པ་',
-                    );
+                return [
+                    0 => 'གཟའ་ཉི་མ་',
+                    1 => 'གཟའ་ཟླ་བ་',
+                    2 => 'གཟའ་མིག་དམར་',
+                    3 => 'གཟའ་ལྷག་པ་',
+                    4 => 'གཟའ་ཕུར་བུ་',
+                    5 => 'གཟའ་པ་སངས་',
+                    6 => 'གཟའ་སྤེན་པ་',
+                ];
         }
     }
 
-        public function intervals(): array{
-                    return array (
-              'year' => '{n, plural, one {# year} other {# years}}',
-              'month' => '{n, plural, one {# month} other {# months}}',
-              'week' => '{n, plural, one {# week} other {# weeks}}',
-              'day' => '{n, plural, one {# day} other {# days}}',
-              'hour' => '{n, plural, one {# hr} other {# hr}}',
-              'minute' => '{n, plural, one {# min} other {# min}}',
-              'second' => '{n, plural, one {# sec} other {# sec}}',
-              'millisecond' => '{n, plural, one {# ms} other {# ms}}',
-              'microsecond' => '{n, plural, one {# µs} other {# µs}}',
-              'nanosecond' => '{n, plural, one {# ns} other {# ns}}',
-            );
-                }
+    public function intervals(): array
+    {
+        return [
+            'year'        => '{n, plural, one {# year} other {# years}}',
+            'month'       => '{n, plural, one {# month} other {# months}}',
+            'week'        => '{n, plural, one {# week} other {# weeks}}',
+            'day'         => '{n, plural, one {# day} other {# days}}',
+            'hour'        => '{n, plural, one {# hr} other {# hr}}',
+            'minute'      => '{n, plural, one {# min} other {# min}}',
+            'second'      => '{n, plural, one {# sec} other {# sec}}',
+            'millisecond' => '{n, plural, one {# ms} other {# ms}}',
+            'microsecond' => '{n, plural, one {# µs} other {# µs}}',
+            'nanosecond'  => '{n, plural, one {# ns} other {# ns}}',
+        ];
+    }
 
-        public function currencies(): array{
-                   return require __DIR__ . DIRECTORY_SEPARATOR . 'Currencies.php';
-                }
+    public function currencies(): array
+    {
+        return require __DIR__ . DIRECTORY_SEPARATOR . 'Currencies.php';
+    }
 
-        public function languages(): array{
-                   return require __DIR__ . DIRECTORY_SEPARATOR . 'Languages.php';
-                }
+    public function languages(): array
+    {
+        return require __DIR__ . DIRECTORY_SEPARATOR . 'Languages.php';
+    }
 
-        public function territories(): array{
-                   return require __DIR__ . DIRECTORY_SEPARATOR . 'Territories.php';
-                }
+    public function territories(): array
+    {
+        return require __DIR__ . DIRECTORY_SEPARATOR . 'Territories.php';
+    }
 }

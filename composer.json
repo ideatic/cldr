@@ -11,6 +11,9 @@
   "require": {
     "php": ">=7.4"
   },
+  "require-dev": {
+    "ext-curl": "*"
+  },
   "autoload": {
     "psr-0": {
       "i18n_": "src/"

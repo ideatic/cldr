@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 /**
@@ -137,14 +136,10 @@ abstract class i18n_Locale
 
     /**
      * Obtiene una lista de todos los locales disponibles
-     *
-     * @param string $locale Si se indica, obtiene un valor que indica si existe ese locale
-     *
-     * @return string[]|bool
      */
-    public static function available(string $locale )
+    public static function available(string $locale): bool
     {
-        return is_file( __DIR__ . '/Locale/' . str_replace('-', '/', $locale) . '/Data.php');
+        return is_file(__DIR__ . '/Locale/' . str_replace('-', '/', $locale) . '/Data.php');
     }
 
     /**
