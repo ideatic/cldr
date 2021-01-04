@@ -190,6 +190,19 @@ abstract class i18n_Locale
     }
 
     /**
+     * Obtiene el código de idioma dado un locale completo
+     */
+    public static function getLanguage(string $locale): string
+    {
+        if (strpos($locale, '_') !== false) { // Aceptar referencias con _ y - como separador
+            $locale = str_replace('_', '-', $locale);
+        }
+
+        $parts = explode('-', $locale);
+        return strtolower(reset($parts));
+    }
+
+    /**
      * Analiza un código RFC de una cultura, y devuelve un array con todas sus variantes válidas,
      * ordenado desde la más específica hasta la más neutra.
      * P.ej.:
