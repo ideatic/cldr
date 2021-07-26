@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -526,7 +527,7 @@ class i18n_Locale_{$className}_Data extends i18n_Locale
         }
 
         if (!empty($months) && !isset($months[i18n_Locale::TYPE_ABBREVIATED])) {
-            $months[i18n_Locale::TYPE_ABBREVIATED] = Arr::get($months, i18n_Locale::TYPE_WIDE, null);
+            $months[i18n_Locale::TYPE_ABBREVIATED] = $months[i18n_Locale::TYPE_WIDE] ?? null;
         }
 
         foreach ($months as $type => $values) {
