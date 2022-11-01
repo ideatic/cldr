@@ -18,16 +18,19 @@ class i18n_Builder_Locale
 
     public string|null $cldrVersion = null;
 
-    public const DB_URL = 'http://www.unicode.org/Public/cldr/latest/core.zip';
+    public const DB_URL = 'https://www.unicode.org/Public/cldr/latest/core.zip';
 
-    public function build(string $outputPath, ?string $sourcePath = '')
+    public function build(string $outputDir, ?string $sourcePath = '', string $version = '')
     {
         set_time_limit(7200);
         $this->_dateConverter = new i18n_Builder_DateConverter();
+        if ($version) {
+            $this->cldrVersion = $version;
+        }
 
         // Preparar fuentes
         if (empty($sourcePath)) {
-            [$tempPath, $sourcePath] = $this->_downloadCLDR($outputPath);
+            [$tempPath, $sourcePath] = $this->_downloadCLDR($outputDir);
         }
 
         /*
@@ -60,7 +63,7 @@ class i18n_Builder_Locale
             if (IO::getFilenameWithoutExtension($path) != 'root') {
                 echo "Processing {$file}...";
                 $data = $this->_extractLocaleData($path);
-                $this->_writeLocale($data, $outputPath);
+                $this->_writeLocale($data, $outputDir);
                 echo ' done' . PHP_EOL;
             }
         }
@@ -88,7 +91,7 @@ class i18n_Builder_Locale
         $zipPath = $tempPath . '/core.zip';
         if (!file_exists($zipPath)) {
             $latestUrl = self::DB_URL;
-            echo "<p>Downloading $latestUrl</p>";
+            echo "Downloading {$latestUrl}" . PHP_EOL;
             $ch = curl_init($latestUrl);
             $fp = fopen($zipPath, "w");
             curl_setopt($ch, CURLOPT_FILE, $fp);
