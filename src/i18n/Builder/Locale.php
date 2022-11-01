@@ -12,17 +12,18 @@ declare(strict_types=1);
 class i18n_Builder_Locale
 {
 
-    private $_dataPath;
-    private $_data = [];
-    private $_dateDonverter;
+    private string $_dataPath;
+    private array $_data = [];
+    private i18n_Builder_DateConverter $_dateConverter;
 
-    public $cldrVersion;
+    public string|null $cldrVersion = null;
 
     public const DB_URL = 'http://www.unicode.org/Public/cldr/latest/core.zip';
 
     public function build(string $outputPath, ?string $sourcePath = '')
     {
         set_time_limit(7200);
+        $this->_dateConverter = new i18n_Builder_DateConverter();
 
         // Preparar fuentes
         if (empty($sourcePath)) {
@@ -37,8 +38,6 @@ class i18n_Builder_Locale
           $pluralXml = simplexml_load_file($pluralFile);
           $this->parsePluralRules($pluralXml);
          */
-
-        $this->_dateDonverter = new i18n_Builder_DateConverter();
 
         // Buscar archivos origen (.xml)
         $this->_dataPath = $sourcePath . '/common/main';
@@ -62,25 +61,25 @@ class i18n_Builder_Locale
                 echo "Processing {$file}...";
                 $data = $this->_extractLocaleData($path);
                 $this->_writeLocale($data, $outputPath);
-                echo ' done<br/>';
+                echo ' done' . PHP_EOL;
             }
         }
 
 
         // Eliminar temporales
         if (isset($tempPath)) {
-            unlink($tempPath);
+            IO::delete($tempPath, true);
         }
 
-        echo '<h2>Finish</h2>';
+        echo 'Finish!';
     }
 
-    private function _downloadCLDR($outputPath): array
+    private function _downloadCLDR(string $outputPath): array
     {
         // Si no se indica la carpeta con el código fuente, crearla dentro de la carpeta destino temporalmente y descargar la última versión
         $tempPath = $outputPath . '/locale_builder_data';
         if (!is_dir($tempPath)) {
-            if (!mkdir($tempPath)) {
+            if (!mkdir($tempPath, 0777, true)) {
                 throw new Exception("Directory '{$tempPath}' can not be created.");
             }
         }
@@ -130,7 +129,7 @@ class i18n_Builder_Locale
         for ($i = 0; $i < count($parts); $i++) {
             $analice[] = implode('_', array_slice($parts, 0, $i + 1));
         }
-        $analice = array_unique(Arr::trim($analice, true));
+        $analice = array_unique(array_filter(array_map(fn(string $p) => trim($p), $analice)));
 
         // Analizar datos por orden
         $data = [ // Datos por defecto
@@ -236,7 +235,7 @@ class i18n_Builder_Locale
             } else {
                 if (is_array($value)) {
                     if (in_array($name, ['languages', 'territories', 'currencies'])) {
-                        $fileName = Str::capitalizeFirst($name);
+                        $fileName = mb_strtoupper(mb_substr($name, 0, 1)) . mb_substr($name, 1);
                         $array = var_export($value, true);
                         $php = "<?php
 declare(strict_types=1);
@@ -463,7 +462,7 @@ class i18n_Locale_{$className}_Data extends i18n_Locale
         foreach ($languages as $language) {
             $code = str_replace('-', '_', (string)$language['type']);
             if ((string)$language != '') {
-                if (strlen($code) == 2 || strpos($code, '_') !== false) { //Solo idiomas comunes
+                if (strlen($code) == 2 || str_contains($code, '_')) { //Solo idiomas comunes
                     $data['languages'][$code] = (string)$language;
                 }
             }
@@ -663,7 +662,7 @@ class i18n_Locale_{$className}_Data extends i18n_Locale
                 }
 
                 if (isset($count)) {
-                    $plurals[] = "{$count} {" . str_replace('{0}', '#', $pattern) . "}";
+                    $plurals[] = "{$count} {" . str_replace('{0}', '#', (string)$pattern) . "}";
                 }
             }
 
@@ -718,12 +717,12 @@ class i18n_Locale_{$className}_Data extends i18n_Locale
                 $formats[(string)$type['type']] = (string)$pattern[0];
             }
             if (isset($formats['long']) || isset($formats['full'])) {
-                $data['longDate'] = $this->_dateDonverter->convert(
+                $data['longDate'] = $this->_dateConverter->convert(
                     $formats['long'] ?? $formats['full']
                 );
             }
             if (isset($formats['medium']) || isset($formats['short'])) {
-                $data['shortDate'] = $this->_dateDonverter->convert(
+                $data['shortDate'] = $this->_dateConverter->convert(
                     $formats['medium'] ?? $formats['short']
                 );
             }
@@ -740,10 +739,10 @@ class i18n_Locale_{$className}_Data extends i18n_Locale
                 $formats[(string)$type['type']] = (string)$pattern[0];
             }
             if (isset($formats['long']) || isset($formats['medium'])) {
-                $data['longTime'] = $this->_dateDonverter->convert($formats['medium'] ?? $formats['long']);
+                $data['longTime'] = $this->_dateConverter->convert($formats['medium'] ?? $formats['long']);
             }
             if (isset($formats['medium']) || isset($formats['short'])) {
-                $data['shortTime'] = $this->_dateDonverter->convert($formats['short'] ?? $formats['medium']);
+                $data['shortTime'] = $this->_dateConverter->convert($formats['short'] ?? $formats['medium']);
             }
         }
     }
@@ -806,5 +805,506 @@ class PhpArrayGetter
         }
     }";
     }
+
+}
+
+
+/**
+ * Helper para el trabajo con ficheros y sistemas de archivos
+ */
+abstract class IO
+{
+    private static function _ioFunc(string $funcName, string $path, string $eventName): mixed
+    {
+        return $funcName($path);
+    }
+
+    /**
+     * Comprueba si la ruta existe
+     */
+    public static function exists(string $path): bool
+    {
+        return self::_ioFunc('file_exists', $path, 'exists');
+    }
+
+    /**
+     * Comprueba si la ruta existe y es un fichero
+     */
+    public static function isFile(string $path): bool
+    {
+        return self::_ioFunc('is_file', $path, 'is file');
+    }
+
+    /**
+     * Comprueba si la ruta existe y es una carpeta
+     */
+    public static function isDir(string $path): bool
+    {
+        return self::_ioFunc('is_dir', $path, 'is dir');
+    }
+
+    /**
+     * Devuelve la fecha de modificación del archivo indicado
+     */
+    public static function mtime(string $path): int|false
+    {
+        return self::_ioFunc('filemtime', $path, 'mod time');
+    }
+
+    /**
+     * Devuelve el contenido del archivo indicado
+     */
+    public static function read(string $path, bool $throw = false): string|false
+    {
+        $result = self::_ioFunc('file_get_contents', $path, 'read');
+
+        if ($throw && $result === false) {
+            throw new IO_Exception("Unable to read '{$path}'");
+        }
+
+        return $result;
+    }
+
+    /**
+     * Escribe datos en el fichero indicado
+     *
+     * @param int $flags Flags aceptados por la función file_put_contents
+     *
+     * @throws IO_Exception
+     */
+    public static function write(string $path, mixed $data, int $flags = 0, bool $autoCreateDir = false): int
+    {
+        if ($autoCreateDir && !IO::isDir(dirname($path))) {
+            mkdir(dirname($path), 0777, true);
+        }
+
+        $result = file_put_contents($path, $data, $flags);
+
+        if ($result === false) {
+            throw new IO_Exception("Unable to write '{$path}'");
+        }
+
+        return $result;
+    }
+
+    /**
+     * Escribe datos en el fichero indicado solo si su contenido es distinto
+     *
+     * @param int $flags Flags aceptados por la función file_put_contents
+     *
+     * @throws IO_Exception
+     */
+    public static function writeIfChanged(string $path, mixed $data, int $flags = 0, bool $autoCreateDir = false): int
+    {
+        if (!IO::exists($path) || strcmp(IO::read($path), $data) != 0) {
+            return IO::write($path, $data, $flags, $autoCreateDir);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Combina dos o más rutas en una sola:
+     *
+     * a, b    -> a/b
+     * a/, /b  -> a/b
+     * a/, b   -> a/b
+     * a, b/   -> a/b/
+     * ,b/     -> b/
+     */
+    public static function combinePaths(string ...$paths): string
+    {
+        $separator = DIRECTORY_SEPARATOR;
+        $path = '';
+        foreach ($paths as $arg) {
+            $end = str_ends_with($path, $separator);
+            $start = empty($arg) ? false : $arg[0] == $separator;
+            if ($end && $start) {
+                $path .= substr($arg, 1);
+            } elseif (empty($path) || $end || $start) {
+                $path .= $arg;
+            } else {
+                $path .= $separator . $arg;
+            }
+        }
+        return $path;
+    }
+
+    /**
+     * Comprueba si la ruta cumple con el patrón SHELL indicado
+     *
+     * @param string $pattern Patrón a comprobar
+     */
+    public static function match(string $pattern, string $path, bool $ignoreCase = true): bool
+    {
+        if (function_exists('fnmatch')) {
+            return fnmatch($pattern, $path, $ignoreCase ? 0 : FNM_CASEFOLD);
+        } else {
+            static $patternCache = [];
+
+            if (!isset($patternCache[$pattern])) {
+                if (count($patternCache[$pattern]) > 50) {
+                    array_shift($patternCache);
+                }
+
+                $patternCache[$pattern] = '#^' . strtr(
+                        preg_quote($pattern, '#'),
+                        [
+                            preg_quote('*', '#')  => '.*',
+                            preg_quote('?', '#')  => '.?',
+                            preg_quote('[!', '#') => '[^',
+                            preg_quote('[', '#')  => '[',
+                            preg_quote(']', '#')  => ']',
+                            preg_quote('\\', '#') => '\\\\',
+                        ]
+                    ) . '$#';
+            }
+
+            return preg_match($patternCache[$pattern] . ($ignoreCase ? 'i' : ''), $path) > 0;
+        }
+    }
+
+    /**
+     * Obtiene una lista de todas las carpetas contenidas en la ruta especificada
+     *
+     * @param int    $depth   Profundidad del análisis (-1 = recursivo, 0 = directorio actual, 1 = actual e hijos de primer nivel, etc.)
+     * @param string $pattern Patrón shell que se usará para filtrar los resultados
+     *
+     * @return string[]
+     */
+    public static function getFiles(string $directory, int $depth = 0, string $pattern = '*', bool $fullPaths = true, array $flags = []): array
+    {
+        return self::get(
+            $directory,
+            $depth,
+            $pattern,
+            [
+                self::GET_PATHS_TYPE => $fullPaths ? self::FULL_PATH : self::RELATIVE_PATH,
+                self::GET_DIRS       => false,
+                self::GET_FILES      => true
+            ] + $flags
+        );
+    }
+
+
+    /**
+     * Obtiene una lista de todas las carpetas contenidas en la ruta especificada
+     *
+     * @param int    $depth   Profundidad del análisis (-1 = recursivo, 0 = directorio actual, 1 = actual e hijos de primer nivel, etc.)
+     * @param string $pattern Patrón shell que se usará para filtrar los resultados
+     *
+     * @return string[]
+     */
+    public static function getFolders(string $directory, int $depth = 0, string $pattern = '*', bool $fullPaths = true, array $flags = []): array
+    {
+        return self::get(
+            $directory,
+            $depth,
+            $pattern,
+            [
+                self::GET_PATHS_TYPE => $fullPaths ? self::FULL_PATH : self::RELATIVE_PATH,
+                self::GET_DIRS       => true,
+                self::GET_FILES      => false
+            ] + $flags
+        );
+    }
+
+    /**
+     * Incluir directorios en el resultado
+     */
+    public const GET_DIRS = 1;
+
+    /**
+     * Incluir archivos en el resultado
+     */
+    public const GET_FILES = 2;
+
+    /**
+     * Define el modo de las rutas incluidas en el resultado (absolutas/relativas)
+     */
+    public const GET_PATHS_TYPE = 3;
+
+    /**
+     * Representa una ruta absoluta
+     */
+    public const FULL_PATH = 0;
+
+    /**
+     * Representa una ruta relativa
+     */
+    public const RELATIVE_PATH = 1;
+
+    /**
+     * Devolver el resultado como un array que represente la jerarquía original de directorios.
+     *
+     * array
+     * (
+     * [0] => file.html
+     * [1] => fil2.html
+     * [this_is_a_folder] => array
+     * (
+     * [0] => subfile.html
+     * )
+     * )
+     */
+    public const GET_ARRAY_REPRESENTATION = 4;
+
+    /**
+     * Tener en cuenta mayúsculas y minúsculas a la hora de aplicar el patrón buscado
+     */
+    public const GET_CASE_INSENSITIVE = 5;
+
+    /**
+     * Modo conteo: la función contará los archivos que cumplen los requisitos en lugar de devolver sus rutas
+     */
+    public const GET_COUNT_MODE = 6;
+
+    /**
+     * No incluir la operación actual en el perfilador
+     */
+    public const GET_USE_PROFILER = 7;
+
+    /**
+     * Flag que permite indicar un listado de directorios a ignorar
+     */
+    public const GET_EXCLUDE = 8;
+
+    /**
+     * Flag que permite indicar un patrón para filtrar archivos
+     */
+    public const PATTERN = 9;
+
+    /**
+     * Obtiene archivos y directorios del sistema de archivos
+     *
+     * @param string   $path          Directorio local o remoto donde buscar
+     * @param int      $depth         Profundidad de la búsqueda (-1 sin límite, 0 directorio actual, 1 actual e hijos, etc.)
+     * @param callable $callback      Función llamada para cada archivo encontrado
+     * @param array    $flags         Opciones de búsqueda
+     * @param int      $limit         Límite de archivos a buscar (-1 desactiva esta funcionalidad)
+     *
+     * @param bool     $limitExceeded Flag activado cuando se supera el límite de archivos a buscar
+     */
+    public static function walk(
+        string $path,
+        int $depth,
+        callable $callback,
+        array $flags = [],
+        int $limit = -1,
+        bool &$limitExceeded = null,
+        string $prefix = ''
+    ): int {
+        $flags += [
+            IO::GET_DIRS    => true,
+            IO::GET_FILES   => true,
+            IO::PATTERN     => null,
+            IO::GET_EXCLUDE => null
+        ];
+
+        // Preparar patrón y variables
+        $excludePaths = $flags[self::GET_EXCLUDE];
+        $limitExceeded = false;
+
+        // Recorrer directorio
+        $dirh = opendir($path);
+        if ($dirh === false) {
+            throw new IO_Exception("Unable to opendir '{$path}'");
+        }
+
+        $count = 0;
+        $separator = DIRECTORY_SEPARATOR;
+        $path = rtrim($path, $separator);
+        $ignorePattern = !$flags[IO::PATTERN] || $flags[IO::PATTERN] == '*';
+        while (($file = readdir($dirh)) !== false) {
+            if ($file == '.' || $file == '..') {
+                continue;
+            }
+            $fullPath = $path . $separator . $file;
+
+            $isDir = is_dir($fullPath);
+
+            // Comprobar si el fichero o directo cumple el patrón y los requisitos del usuario
+            if (($isDir ? $flags[IO::GET_DIRS] : $flags[IO::GET_FILES])) {
+                if ($ignorePattern || IO::match($flags[IO::PATTERN], $file)) {
+                    $callback($fullPath, $prefix . $file);
+                }
+                $count++;
+            }
+
+            // Escanear directorio
+            if ($isDir) {
+                $scanDir = $depth != 0;
+
+                if ($scanDir && !empty($excludePaths) && (in_array($fullPath, $excludePaths) || in_array(realpath($fullPath), $excludePaths))) {
+                    $scanDir = false;
+                }
+
+                if ($scanDir) { // Recorrer los directorios hijos
+                    $count += IO::walk(
+                        $fullPath,
+                        $depth > 0 ? $depth - 1 : -1,
+                        $callback,
+                        $flags,
+                        $limit > 0 ? max(1, $limit - $count) : $limit,
+                        $limitExceeded,
+                        $prefix . $file . $separator
+                    );
+                }
+            }
+
+            // Parar al llegar al límite de archivos
+            if ($limit > 0 && $count >= $limit) {
+                $limitExceeded = true;
+                break;
+            }
+        }
+
+        closedir($dirh);
+
+        return $count;
+    }
+
+    /**
+     * Recorre todos los archivos de la carpeta indicada, llamando a la función por cada uno de los que cumple los requisitos
+     */
+    public static function walkFiles(string $path, int $depth, callable $callback, array $flags = []): int
+    {
+        $flags[self::GET_DIRS] = false;
+        return self::walk($path, $depth, $callback, $flags);
+    }
+
+    /**
+     * Obtiene archivos y directorios del sistema de archivos
+     *
+     * @param string   $path          Directorio local o remoto donde buscar
+     * @param int      $depth         Profundidad de la búsqueda (-1 sin límite, 0 directorio actual, 1 actual e hijos, etc.)
+     * @param callable $callback      Función utilizada para filtrar los resultados
+     * @param array    $flags         Opciones de búsqueda
+     * @param int      $limit         Límite de archivos a buscar (-1 desactiva esta funcionalidad)
+     *
+     * @param bool     $limitExceeded Flag activado cuando se supera el límite de archivos a buscar
+     *
+     * @return array|bool
+     */
+    public static function map(
+        string $path,
+        int $depth = 0,
+        callable $callback = null,
+        array $flags = [],
+        int $limit = -1,
+        bool &$limitExceeded = null
+    ) {
+        $fullPaths = !isset($flags[IO::GET_PATHS_TYPE]) || $flags[IO::GET_PATHS_TYPE] == IO::FULL_PATH;
+        $counting = $flags[IO::GET_COUNT_MODE] ?? false;
+
+        $result = $counting ? 0 : [];
+        IO::walk(
+            $path,
+            $depth,
+            static function ($fullPath, $file) use ($callback, &$result, $counting, $fullPaths) {
+                if ($callback($file, $fullPath)) {
+                    if ($counting) {
+                        $result++;
+                    } else {
+                        $result[] = $fullPaths ? $fullPath : $file;
+                    }
+                }
+            },
+            $flags,
+            $limit,
+            $limitExceeded
+        );
+
+        return $result;
+    }
+
+    /**
+     * Obtiene archivos y directorios del sistema de archivos
+     *
+     * @param string $path          Directorio local o remoto donde buscar
+     * @param int    $depth         Profundidad de la búsqueda (-1 sin límite, 0 directorio actual, 1 actual e hijos, etc.)
+     * @param string $pattern       Patrón shell que deben cumplir los resultados
+     * @param array  $flags         Opciones de búsqueda
+     * @param int    $limit         Límite de archivos a buscar (-1 desactiva esta funcionalidad)
+     *
+     * @param bool   $limitExceeded Flag activado cuando se supera el límite de archivos a buscar
+     *
+     * @return array|bool
+     */
+    public static function get(
+        string $path,
+        int $depth = 0,
+        string $pattern = '*',
+        array $flags = [],
+        int $limit = -1,
+        bool &$limitExceeded = null
+    ) {
+        $pattern = trim($pattern);
+        $ignorePattern = $pattern == '' || $pattern == '*';
+        $ignoreCase = $flags[IO::GET_CASE_INSENSITIVE] ?? true;
+        return IO::map(
+            $path,
+            $depth,
+            fn($file) => $ignorePattern || IO::match($pattern, basename($file), $ignoreCase),
+            $flags,
+            $limit,
+            $limitExceeded
+        );
+    }
+
+    /**
+     * Devuelve el nombre del archivo o directorio (sin la extensión) representado por la ruta indicada
+     */
+    public static function getFilenameWithoutExtension(string $path): string
+    {
+        $fileName = basename($path);
+        $pos = strrpos($fileName, '.');
+        if ($pos !== false) {
+            return substr($fileName, 0, $pos);
+        }
+        return $fileName;
+    }
+
+
+    /**
+     * Borra el contenido de un archivo o directorio
+     * @return bool TRUE si la operación se ha realizado con éxito, FALSE en caso contrario
+     */
+    public static function delete(string $path, bool $recursive = true): bool
+    {
+        if (is_dir($path)) {
+            if (is_link($path)) {
+                return rmdir($path);
+            }
+
+            $dirh = opendir($path);
+            if ($dirh === false) {
+                return false;
+            }
+
+            while (($file = readdir($dirh)) !== false) {
+                if ($file == '.' || $file == '..') {
+                    continue;
+                }
+                $combinedPath = IO::combinePaths($path, $file);
+                if (is_dir($combinedPath)) { // Borrar directorio
+                    if ($recursive) {
+                        IO::delete($combinedPath, $recursive);
+                    }
+                } else { // Borrar archivo
+                    unlink($combinedPath);
+                }
+            }
+            closedir($dirh);
+            return rmdir($path);
+        } else {
+            return unlink($path);
+        }
+    }
+
+}
+
+class IO_Exception extends Exception
+{
 
 }
